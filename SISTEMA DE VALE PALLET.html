@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerador de Vale Pallet Dicon</title>
+    <style>
+        body {
+            background-color: #f5f5f5;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 20px;
+            transition: background-color 0.3s;
+        }
+
+        .recibo {
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            text-align: left;
+            margin: 30px auto;
+            max-width: 600px;
+            position: relative;
+        }
+
+        .recibo h3 {
+            text-align: center;
+        }
+
+        .imagemRecibo {
+            text-align: center;
+        }
+
+        .imagemRecibo img {
+            display: block;
+            margin: 0 auto;
+            max-width: 100%;
+            max-height: 200px;
+        }
+
+        input,
+        button {
+            display: block;
+            width: 100%;
+            box-sizing: border-box;
+            padding: 10px;
+            margin: 10px auto;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        button {
+            background-color: #007bff;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .valorTotal {
+            text-align: right;
+            margin-top: 15px;
+            font-weight: bold;
+            font-size: 1.5em;
+            position: absolute;
+            top: 10px;
+            right: 20px;
+        }
+
+        .reciboFooter {
+            text-align: center;
+        }
+
+        .author {
+            position: fixed;
+            bottom: 10px;
+            left: 10px;
+            font-size: 12px;
+            color: #777;
+        }
+
+        @media print {
+            .recibo {
+                text-align: left;
+            }
+
+            .imagemRecibo {
+                margin: 20px auto;
+                display: block;
+            }
+
+            .valorTotal {
+                text-align: right;
+                margin-top: 15px;
+                font-weight: bold;
+                font-size: 1.5em;
+                position: absolute;
+                top: 10px;
+                right: 20px;
+            }
+
+            .recibo+.recibo {
+                margin-top: 50px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <h2>Gerador de Recibos</h2>
+
+    <div class="recibo">
+        <h3>RECIBO</h3>
+        <div class="imagemRecibo">
+            <img src="C:/Users/ESTOQUE/Pictures/imagemdicon.jpg" alt="Imagem do Recibo" width="360">
+        </div>
+        <label for="nomeCliente">CLIENTE:</label>
+        <input type="text" id="nomeCliente" placeholder="Digite o nome do cliente">
+
+        <label for="nf">NF:</label>
+        <input type="number" id="nf" placeholder="Digite o número da NF">
+
+        <label for="quantidadePaletes">QTDE DE PALLETS:</label>
+        <input type="number" id="quantidadePaletes" placeholder="Digite a quantidade de paletes">
+
+        <label for="vias">Número de Vias:</label>
+        <select id="vias">
+            <option value="1">1 via</option>
+            <option value="2" selected>2 vias</option>
+            <option value="3">3 vias</option>
+            <option value="4">4 vias</option>
+        </select>
+
+        <div class="observacao" id="observacao"></div>
+
+        <div class="valorTotal" id="valorTotal"></div>
+
+        <button onclick="gerarRecibo()">Gerar Recibo</button>
+        <div class="reciboFooter">
+            <p class="assinatura">Assinatura: _________________________</p>
+            <p class="queimados">Queimados, Rio de Janeiro, 19 de março de 2024</p>
+            <p class="cnpj">DICON ATACADAO DE ALIMENTOS LTDA</p>
+        </div>
+    </div>
+
+    <!-- Adiciona um iframe para imprimir -->
+    <iframe id="printFrame"></iframe>
+
+    <div class="author">Criado por: Daniel Rocha</div>
+
+    <script>
+        function gerarRecibo() {
+            const nomeCliente = document.getElementById('nomeCliente').value;
+            const numeroNF = document.getElementById('nf').value;
+            const quantidadePaletes = document.getElementById('quantidadePaletes').value;
+            const numVias = document.getElementById('vias').value;
+
+            const observacao = `OBS: Ficamos com ${quantidadePaletes} pallets.`;
+
+            const dataHoje = new Date().toLocaleDateString('pt-BR', {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric',
+            });
+
+            let recibos = '';
+
+            for (let i = 0; i < numVias; i++) {
+                const recibo = `
+                    <div class="recibo">
+                        <h3>RECIBO</h3>
+                        <div class="imagemRecibo">
+                            <img src="C:/Users/ESTOQUE/Pictures/imagemdicon.jpg" alt="Imagem do Recibo" width="460">
+                        </div>
+                        <p>CLIENTE: <strong>${nomeCliente}</strong></p>
+                        <p>NF: <strong>${numeroNF}</strong></p>
+                        <p>${observacao}</p>
+                        <p>Por ser verdade, firmamos o presente recibo.</p>
+                        <div class="reciboFooter">
+                            <p class="queimados"><em>Queimados, ${dataHoje}</em></p>
+                            <p class="assinatura">Assinatura: _________________________</p>
+                            <p class="cnpj">CNPJ: <strong>37.218.268/0001-04</strong></p>
+                        </div>
+                    </div>
+                `;
+                recibos += recibo;
+            }
+
+            const printFrame = document.getElementById('printFrame');
+
+            printFrame.contentDocument.open();
+            printFrame.contentDocument.write(`
+                <html>
+                    <head>
+                        <title>Recibo</title>
+                        <style>
+                            /* Estilos CSS para impressão */
+                            body {
+                                font-family: Arial, sans-serif;
+                                text-align: center;
+                            }
+                            .recibo {
+                                text-align: left;
+                                margin: 30px auto;
+                                max-width: 600px;
+                                position: relative;
+                            }
+                            .imagemRecibo {
+                                margin: 20px auto;
+                                display: block;
+                            }
+                            .valorTotal {
+                                text-align: right;
+                                margin-top: 15px;
+                                font-weight: bold;
+                                font-size: 1.5em;
+                                position: absolute;
+                                top: 10px;
+                                right: 20px;
+                            }
+                            .recibo+.recibo {
+                                margin-top: 50px;
+                            }
+                            .recibo+.recibo .imagemRecibo {
+                                margin-top: 70px;
+                            }
+                            .reciboFooter {
+                                text-align: center;
+                            }
+                        </style>
+                    </head>
+                    <body>${recibos}</body>
+                </html>
+            `);
+            printFrame.contentDocument.close();
+
+            printFrame.contentWindow.print();
+        }
+    </script>
+
+</body>
+
+</html>

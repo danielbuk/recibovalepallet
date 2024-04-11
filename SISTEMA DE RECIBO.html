@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerador de Recibos Dicon</title>
+    <style>
+        body {
+            background-color: #f5f5f5;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 20px;
+            transition: background-color 0.3s;
+        }
+
+        .recibo {
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            text-align: left;
+            margin: 30px auto;
+            max-width: 600px;
+            position: relative;
+        }
+
+        .recibo h3 {
+            text-align: center;
+        }
+
+        .imagemRecibo {
+            text-align: center;
+        }
+
+        .imagemRecibo img {
+            display: block;
+            margin: 0 auto;
+            max-width: 100%;
+            max-height: 200px;
+        }
+
+        input,
+        button {
+            display: block;
+            width: 100%;
+            box-sizing: border-box;
+            padding: 10px;
+            margin: 10px auto;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        button {
+            background-color: #007bff;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .valorTotal {
+            text-align: right;
+            margin-top: 15px;
+            font-weight: bold;
+            font-size: 1.5em;
+            position: absolute;
+            top: 10px;
+            right: 20px;
+        }
+
+        .reciboFooter {
+            text-align: center;
+        }
+
+        .author {
+            position: fixed;
+            bottom: 10px;
+            left: 10px;
+            font-size: 12px;
+            color: #777;
+        }
+
+        @media print {
+            .recibo {
+                text-align: left;
+            }
+
+            .imagemRecibo {
+                margin: 20px auto;
+                display: block;
+            }
+
+            .valorTotal {
+                text-align: right;
+                margin-top: 15px;
+                font-weight: bold;
+                font-size: 1.5em;
+                position: absolute;
+                top: 10px;
+                right: 20px;
+            }
+
+            .recibo+.recibo {
+                margin-top: 50px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <h2>Gerador de Recibos</h2>
+
+    <div class="recibo">
+        <h3>RECIBO</h3>
+        <div class="imagemRecibo">
+            <img src="C:/Users/ESTOQUE/Pictures/imagemdicon.jpg" alt="Imagem do Recibo" width="360">
+        </div>
+        <label for="nomeCliente">Nome do Cliente:</label>
+        <input type="text" id="nomeCliente" placeholder="Digite o nome do cliente">
+
+        <label for="quantidadePaletes">Quantidade de Paletes:</label>
+        <input type="text" id="quantidadePaletes" placeholder="Digite a quantidade de paletes">
+
+        <label for="valorPorPalete">Valor por Palete (R$):</label>
+        <input type="text" id="valorPorPalete" placeholder="Digite o valor por palete">
+
+        <label for="formaPagamento">Forma de Pagamento:</label>
+        <input type="text" id="formaPagamento" placeholder="Digite a forma de pagamento (ex: PIX)">
+
+        <label for="nf">Número da NF:</label>
+        <input type="text" id="nf" placeholder="Digite o número da NF">
+
+        <div class="valorTotal" id="valorTotal"></div>
+
+        <button onclick="gerarRecibo()">Gerar Recibo</button>
+        <div class="reciboFooter">
+            <p class="assinatura">Assinatura: _________________________</p>
+            <p class="queimados">Queimados, ${dataHoje}</p>
+            <p class="cnpj">CNPJ: 37.218.268/0001-04</p>
+        </div>
+    </div>
+
+    <!-- Adiciona um iframe para imprimir -->
+    <iframe id="printFrame"></iframe>
+
+    <div class="author">Criado por: Daniel Rocha</div>
+
+    <script>
+        function gerarRecibo() {
+            const nomeCliente = document.getElementById('nomeCliente').value;
+            const quantidadePaletes = parseInt(document.getElementById('quantidadePaletes').value, 10) || 0;
+            const valorPorPalete = parseFloat(document.getElementById('valorPorPalete').value.replace(',', '.')) || 0;
+            const formaPagamento = document.getElementById('formaPagamento').value;
+            const numeroNF = document.getElementById('nf').value;
+
+            const valorTotal = quantidadePaletes * valorPorPalete;
+
+            const dataHoje = new Date().toLocaleDateString('pt-BR', {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric',
+            });
+
+            const recibo = `
+                <div class="recibo">
+                    <h3>RECIBO</h3>
+                    <div class="imagemRecibo">
+                        <img src="C:/Users/ESTOQUE/Pictures/imagemdicon.jpg" alt="Imagem do Recibo" width="460">
+                    </div>
+                    <p>Recebemos de <strong>${nomeCliente}</strong> a importância supramencionada de <strong>R$${valorTotal.toFixed(2)}</strong></p>
+                    <p>${quantidadePaletes} Paletes / R$${valorPorPalete.toFixed(2)} por palete</p>
+                    <p>Pagamento: ${formaPagamento}</p>
+                    <p>NF: <strong>${numeroNF}</strong></p>
+                    <p>Por ser verdade, firmamos o presente recibo.</p>
+                    <div class="valorTotal">R$${valorTotal.toFixed(2)}</div>
+                    <div class="reciboFooter">
+                        <p class="queimados"><em>Queimados, ${dataHoje}</em></p>
+                        <p class="assinatura">Assinatura: _________________________</p>
+                        <p class="cnpj">CNPJ: <strong>37.218.268/0001-04</strong></p>
+                    </div>
+                </div>
+            `;
+
+            const reciboDuplicado = recibo;
+
+            document.getElementById('valorTotal').innerHTML = `R$${valorTotal.toFixed(2)}`;
+
+            const printFrame = document.getElementById('printFrame');
+
+            printFrame.contentDocument.open();
+            printFrame.contentDocument.write(`
+                <html>
+                    <head>
+                        <title>Recibo</title>
+                        <style>
+                            body {
+                                font-family: Arial, sans-serif;
+                            }
+                            .recibo {
+                                text-align: left;
+                                margin: 30px auto;
+                                max-width: 600px;
+                                position: relative;
+                            }
+                            .imagemRecibo {
+                                margin: 20px auto;
+                                display: block;
+                            }
+                            .valorTotal {
+                                text-align: right;
+                                margin-top: 15px;
+                                font-weight: bold;
+                                font-size: 1.5em;
+                                position: absolute;
+                                top: 10px;
+                                right: 20px;
+                            }
+                            .recibo+.recibo {
+                                margin-top: 50px;
+                            }
+                            .recibo+.recibo .imagemRecibo {
+                                margin-top: 70px;
+                            }
+                            .reciboFooter {
+                                text-align: center;
+                            }
+                        </style>
+                    </head>
+                    <body>${recibo + reciboDuplicado}</body>
+                </html>
+            `);
+            printFrame.contentDocument.close();
+
+            printFrame.contentWindow.print();
+        }
+    </script>
+
+</body>
+
+</html>
